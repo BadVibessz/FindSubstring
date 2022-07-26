@@ -1,4 +1,6 @@
+using System;
 using System.Collections.Generic;
+using System.Linq;
 using System.Text;
 
 namespace AlgorithmLibrary
@@ -38,11 +40,13 @@ namespace AlgorithmLibrary
             return max;
         }
 
-        public static int Find(string text, string subtext)
+        public static int Find(string text, string subtext, int from = 0, int to = 0)
         {
             if (subtext.Length > text.Length) return -1;
             if (subtext == text) return 0;
 
+            if (to == 0) to = text.Length;
+            
             text = text.ToUpperInvariant();
             subtext = subtext.ToUpperInvariant();
 
@@ -55,10 +59,16 @@ namespace AlgorithmLibrary
                 dict.Add(i, PrefixFunction(temp.ToString()));
             }
 
-            for (int i = 0; i < text.Length; i++)
+            for (int i = from; i < to; i++)
             {
                 for (int j = 0; j < subtext.Length; j++)
                 {
+                    if (i == text.Length - 1)
+                    {
+                        if (subtext.Length == 1 && text[text.Length - 1] == Convert.ToChar(subtext)) return text.Length - 1;
+                        break;
+                    }
+                    
                     if (subtext[j] != text[i++])
                     {
                         if (j == 0)
@@ -77,6 +87,21 @@ namespace AlgorithmLibrary
             }
 
             return -1;
+        }
+
+        public static int[] FindAll(string text, string subtext)
+        {
+            var res = new List<int>();
+            
+            int ind = Find(text, subtext);
+            while (ind != -1)
+            {
+                res.Add(ind);
+                ind = Find(text, subtext,ind+subtext.Length);
+            }
+
+            if (res.Count == 0) return null;
+            return res.ToArray();
         }
     }
 }
